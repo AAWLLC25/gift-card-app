@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase a Gift Card</title>
+    <!-- Square Web Payments SDK -->
+    <script type="text/javascript" src="https://sandbox.web.squarecdn.net/v1/square.js"></script>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom font families */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Custom styles for selected state */
+        .selected-amount {
+            background-color: #d3af37; /* Gold Color */
+            color: white;
+            border-color: #d3af37; /* Gold Color */
+        }
+        /* Hide form steps by default */
+        .form-step {
+            display: none;
+        }
+        /* Show the active step */
+        .form-step.active {
+            display: block;
+        }
+        /* Style for the selected delivery option container */
+        .selected-delivery {
+            background-color: #fefcf6; /* Light Gold Color */
+            border-color: #d3af37; /* Gold Color */
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+    <!-- Whimsical background line art -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-20">
+        <svg width="100%" height="100%" viewBox="0 0 1440 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <path d="M-200,800 C-100,700 100,750 200,650 C300,550 400,400 550,450 C700,500 800,650 950,600 C1100,550 1200,400 1350,450 C1500,500 1600,600 1700,500" stroke="#d3af37" fill="none" stroke-width="2"/>
+          <path d="M-200,700 C-100,600 100,650 200,550 C300,450 400,300 550,350 C700,400 800,550 950,500 C1100,450 1200,300 1350,350 C1500,400 1600,500 1700,400" stroke="#d3af37" fill="none" stroke-width="2"/>
+          <path d="M-200,600 C-100,500 100,550 200,450 C300,350 400,200 550,250 C700,300 800,450 950,400 C1100,350 1200,200 1350,250 C1500,300 1600,400 1700,300" stroke="#d3af37" fill="none" stroke-width="2"/>
+          <path d="M-200,500 C-100,400 100,450 200,350 C300,250 400,100 550,150 C700,200 800,350 950,300 C1100,250 1200,100 1350,150 C1500,200 1600,300 1700,200" stroke="#d3af37" fill="none" stroke-width="2"/>
+          <path d="M-200,400 C-100,300 100,350 200,250 C300,150 400,0 550,50 C700,100 800,250 950,200 C1100,150 1200,0 1350,50 C1500,100 1600,200 1700,100" stroke="#d3af37" fill="none" stroke-width="2"/>
+        </svg>
+    </div>
+
+
+    <div class="relative container mx-auto max-w-2xl p-4 sm:p-6 lg:p-8 z-10">
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 sm:p-8">
+            
+            <header class="text-center mb-8">
+                <h2 class="font-cinzel text-2xl tracking-widest text-gray-800">
+                    TOUCH BY THE <span style="color: #d3af37;">A</span>NGEL
+                </h2>
+                <p class="font-cinzel text-sm tracking-widest text-gray-500 uppercase">Massage Therapy</p>
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mt-6">Give The Gift Of Relaxation</h1>
+                <p class="text-gray-500 mt-2">A perfect gift for any occasion.</p>
+            </header>
+
+            <!-- Progress Bar -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between">
+                    <div class="w-full">
+                        <div class="relative">
+                            <div class="absolute top-1/2 -translate-y-1/2 h-1 w-full bg-gray-200 rounded"></div>
+                            <div id="progress-bar" class="absolute top-1/2 -translate-y-1/2 h-1 bg-[#d3af37] rounded transition-all duration-500" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-2 text-sm text-gray-500">
+                    <span id="step-name-1" class="font-semibold text-[#d3af37]">Amount</span>
+                    <span id="step-name-2">Details</span>
+                    <span id="step-name-3">Delivery</span>
+                    <span id="step-name-4">Payment</span>
+                </div>
+            </div>
+
+
+            <form id="gift-card-form">
+                <!-- Step 1: Choose Amount -->
+                <div id="step-1" class="form-step active">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">1. Choose an Amount</h2>
+                    <div class="grid grid-cols-2 gap-4" id="amount-options">
+                        <button type="button" data-amount="75" class="amount-btn p-4 border border-gray-300 rounded-lg text-lg font-medium text-gray-700 hover:border-[#d3af37] hover:text-[#d3af37] transition-colors">$75</button>
+                        <button type="button" data-amount="150" class="amount-btn p-4 border border-gray-300 rounded-lg text-lg font-medium text-gray-700 hover:border-[#d3af37] hover:text-[#d3af37] transition-colors">$150</button>
+                        <button type="button" data-amount="225" class="amount-btn p-4 border border-gray-300 rounded-lg text-lg font-medium text-gray-700 hover:border-[#d3af37] hover:text-[#d3af37] transition-colors">$225</button>
+                        <button type="button" data-amount="300" class="amount-btn p-4 border border-gray-300 rounded-lg text-lg font-medium text-gray-700 hover:border-[#d3af37] hover:text-[#d3af37] transition-colors">$300</button>
+                    </div>
+                    <input type="hidden" id="selected-amount" name="amount" required>
+                </div>
+
+                <!-- Step 2: Recipient Info -->
+                <div id="step-2" class="form-step">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">2. Gift Card Details</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <label for="recipient-name" class="block text-sm font-medium text-gray-600">To (Recipient's Name)</label>
+                            <input type="text" id="recipient-name" name="recipient_name" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                        </div>
+                        <div>
+                            <label for="giver-name" class="block text-sm font-medium text-gray-600">From (Your Name)</label>
+                            <input type="text" id="giver-name" name="giver_name" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="giver-email" class="block text-sm font-medium text-gray-600">Your Email (for payment receipt)</label>
+                            <input type="email" id="giver-email" name="giver_email" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="message" class="block text-sm font-medium text-gray-600">Message to Recipient</label>
+                            <textarea id="message" name="message" rows="4" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition" placeholder="Happy Birthday!"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Delivery Method -->
+                <div id="step-3" class="form-step">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">3. Delivery Option</h2>
+                    <div class="space-y-3">
+                        <!-- Email Option -->
+                        <div class="delivery-option p-4 border border-gray-300 rounded-lg transition">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="delivery_method" value="email" class="h-4 w-4 text-[#d3af37] border-gray-300 focus:ring-[#d3af37]" checked>
+                                <span class="ml-3 text-gray-700"><strong class="font-medium">eGift Card (Email)</strong> - Instant or scheduled delivery.</span>
+                            </label>
+                            <div id="email-options" class="mt-4 pl-7 space-y-4">
+                                <div>
+                                    <label for="recipient-email" class="block text-sm font-medium text-gray-600">Recipient's Email</label>
+                                    <input type="email" id="recipient-email" name="recipient_email" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="flex items-center text-sm">
+                                        <input type="radio" name="send_time" value="now" class="h-4 w-4 text-[#d3af37] border-gray-300 focus:ring-[#d3af37]" checked>
+                                        <span class="ml-2 text-gray-600">Send Immediately</span>
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="radio" name="send_time" value="future" class="h-4 w-4 text-[#d3af37] border-gray-300 focus:ring-[#d3af37]">
+                                        <span class="ml-2 text-gray-600">Schedule for a future date</span>
+                                    </label>
+                                    <div id="send-date-container" class="hidden">
+                                        <input type="date" id="send-date" name="send_date" class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Pickup Option -->
+                        <div class="delivery-option p-4 border border-gray-300 rounded-lg transition">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="delivery_method" value="pickup" class="h-4 w-4 text-[#d3af37] border-gray-300 focus:ring-[#d3af37]">
+                                <span class="ml-3 text-gray-700"><strong class="font-medium">Physical Card (Pickup)</strong> - $5.00 activation fee.</span>
+                            </label>
+                        </div>
+                        <!-- Shipping Option -->
+                        <div class="delivery-option p-4 border border-gray-300 rounded-lg transition">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="delivery_method" value="shipping" class="h-4 w-4 text-[#d3af37] border-gray-300 focus:ring-[#d3af37]">
+                                <span class="ml-3 text-gray-700"><strong class="font-medium">Physical Card (Shipping)</strong> - $5.00 activation + $7.00 shipping.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pickup Details Section (Initially hidden) -->
+                    <div id="pickup-details-section" class="mt-6 hidden space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Pickup Details</h3>
+                        <div>
+                            <label for="pickup-date" class="block text-sm font-medium text-gray-600">Select Pickup Date</label>
+                            <input type="date" id="pickup-date" name="pickup_date" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address Section (Initially hidden) -->
+                    <div id="shipping-address-section" class="mt-6 hidden space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Shipping Address</h3>
+                        <div>
+                            <label for="shipping-street" class="block text-sm font-medium text-gray-600">Street Address</label>
+                            <input type="text" id="shipping-street" name="shipping_street" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition" placeholder="123 Main St">
+                        </div>
+                        <div>
+                            <label for="shipping-apt" class="block text-sm font-medium text-gray-600">Apt, Suite, etc. (Optional)</label>
+                            <input type="text" id="shipping-apt" name="shipping_apt" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition" placeholder="Apartment, suite, unit, building, floor, etc.">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="sm:col-span-1">
+                                <label for="shipping-city" class="block text-sm font-medium text-gray-600">City</label>
+                                <input type="text" id="shipping-city" name="shipping_city" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                            </div>
+                            <div class="sm:col-span-1">
+                                <label for="shipping-state" class="block text-sm font-medium text-gray-600">State</label>
+                                <select id="shipping-state" name="shipping_state" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition"></select>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <label for="shipping-zip" class="block text-sm font-medium text-gray-600">ZIP Code</label>
+                                <input type="text" id="shipping-zip" name="shipping_zip" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d3af37] focus:border-[#d3af37] transition">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Payment -->
+                <div id="step-4" class="form-step">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">4. Payment</h2>
+                    
+                    <!-- Order Summary -->
+                    <div id="order-summary" class="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Order Summary</h3>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Gift Card:</span>
+                            <span id="summary-amount">$0.00</span>
+                        </div>
+                        <div id="summary-activation-row" class="flex justify-between text-gray-600 hidden">
+                            <span>Activation Fee:</span>
+                            <span id="summary-activation-cost">$0.00</span>
+                        </div>
+                        <div id="summary-shipping-row" class="flex justify-between text-gray-600 hidden">
+                            <span>Shipping:</span>
+                            <span id="summary-shipping-cost">$0.00</span>
+                        </div>
+                        <div class="border-t border-gray-300 pt-2 mt-2">
+                            <div class="flex justify-between text-gray-800 font-bold text-lg">
+                                <span>Total:</span>
+                                <span id="summary-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secure Payment Form -->
+                    <div id="card-container"></div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
+                    <button type="button" id="prev-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Previous
+                    </button>
+                    <button type="button" id="next-btn" class="bg-[#d3af37] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#bca031] transition-colors">
+                        Next
+                    </button>
+                    <button type="submit" id="submit-button" class="bg-[#d3af37] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#bca031] transition-all duration-300 ease-in-out hidden disabled:opacity-50">
+                        Purchase Gift Card
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===================================================================================
+        // SQUARE AND SERVER DETAILS
+        // ===================================================================================
+        const SQUARE_APP_ID = 'sandbox-sq0idb-aQHOtkST1xc53ZEMAaWnSA'; 
+        const SQUARE_LOCATION_ID = 'LNDM9J1R5PE2R';
+        // This is now relative, it will use the same domain the page is hosted on.
+        const BACKEND_URL = ''; 
+        // ===================================================================================
+
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            const steps = document.querySelectorAll('.form-step');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-button');
+            const form = document.getElementById('gift-card-form');
+            const progressBar = document.getElementById('progress-bar');
+            const stepNames = [
+                document.getElementById('step-name-1'),
+                document.getElementById('step-name-2'),
+                document.getElementById('step-name-3'),
+                document.getElementById('step-name-4')
+            ];
+
+            let currentStep = 0;
+            const totalSteps = steps.length;
+            const activationFee = 5.00;
+            const shippingCost = 7.00;
+            let card; // To hold the Square Card payment method instance
+
+            // --- Initialize Square Web Payments SDK ---
+            async function initializeCard(payments) {
+                const card = await payments.card();
+                await card.attach('#card-container');
+                return card;
+            }
+
+            if (!SQUARE_APP_ID.startsWith('REPLACE')) {
+                const payments = Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
+                try {
+                    card = await initializeCard(payments);
+                } catch (e) {
+                    console.error('Initializing Card failed', e);
+                    document.getElementById('card-container').innerHTML = "<p class='text-red-500'>Error: Could not load payment form. Please check your Square configuration.</p>";
+                }
+            } else {
+                 document.getElementById('card-container').innerHTML = "<p class='text-orange-500'><strong>Configuration Needed:</strong> Please add your Square Application ID to the script to enable the payment form.</p>";
+            }
+            
+            async function handlePaymentSubmission(event, card) {
+                event.preventDefault();
+                submitBtn.disabled = true;
+
+                try {
+                    const result = await card.tokenize();
+                    if (result.status === 'OK') {
+                        console.log(`Payment Token is ${result.token}`);
+                        
+                        const formData = new FormData(form);
+                        const data = Object.fromEntries(formData.entries());
+                        data.token = result.token;
+                        
+                        const amount = parseFloat(data.amount) || 0;
+                        let total = amount;
+                        if (data.delivery_method === 'pickup' || data.delivery_method === 'shipping') {
+                            total += activationFee;
+                        }
+                        if (data.delivery_method === 'shipping') {
+                            total += shippingCost;
+                        }
+                        data.totalAmount = total;
+
+                        const response = await fetch(`${BACKEND_URL}/api/create-payment`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data),
+                        });
+
+                        const responseData = await response.json();
+
+                        if (response.ok) {
+                            alert(`Success! Payment ID: ${responseData.paymentId}, Certificate ID: ${responseData.certificateId}`);
+                            window.location.reload();
+                        } else {
+                            throw new Error(responseData.error || 'An unknown error occurred.');
+                        }
+
+                    } else {
+                        let error = `Tokenization failed with status: ${result.status}`;
+                        if (result.errors) {
+                            error += ` and errors: ${JSON.stringify(result.errors)}`;
+                        }
+                        throw new Error(error);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert(`Payment failed: ${e.message}`);
+                    submitBtn.disabled = false;
+                }
+            }
+
+            // --- Step Navigation and Validation ---
+            function updateProgress() {
+                progressBar.style.width = `${(currentStep / (totalSteps - 1)) * 100}%`;
+                stepNames.forEach((name, index) => {
+                    if (index === currentStep) {
+                        name.classList.add('font-semibold', 'text-[#d3af37]');
+                        name.classList.remove('text-gray-500');
+                    } else {
+                        name.classList.remove('font-semibold', 'text-[#d3af37]');
+                        name.classList.add('text-gray-500');
+                    }
+                });
+                prevBtn.disabled = currentStep === 0;
+                nextBtn.classList.toggle('hidden', currentStep === totalSteps - 1);
+                submitBtn.classList.toggle('hidden', currentStep !== totalSteps - 1);
+            }
+
+            function showStep(stepIndex) {
+                steps.forEach((step, index) => {
+                    step.classList.toggle('active', index === stepIndex);
+                });
+                updateProgress();
+            }
+
+            function updateOrderSummary() {
+                const amount = parseFloat(document.getElementById('selected-amount').value) || 0;
+                const deliveryMethod = document.querySelector('input[name="delivery_method"]:checked').value;
+
+                const summaryAmount = document.getElementById('summary-amount');
+                const summaryActivationRow = document.getElementById('summary-activation-row');
+                const summaryActivationCost = document.getElementById('summary-activation-cost');
+                const summaryShippingRow = document.getElementById('summary-shipping-row');
+                const summaryShippingCost = document.getElementById('summary-shipping-cost');
+                const summaryTotal = document.getElementById('summary-total');
+
+                summaryAmount.textContent = `$${amount.toFixed(2)}`;
+                let total = amount;
+
+                if (deliveryMethod === 'pickup' || deliveryMethod === 'shipping') {
+                    summaryActivationRow.classList.remove('hidden');
+                    summaryActivationCost.textContent = `$${activationFee.toFixed(2)}`;
+                    total += activationFee;
+                } else {
+                    summaryActivationRow.classList.add('hidden');
+                }
+
+                if (deliveryMethod === 'shipping') {
+                    summaryShippingRow.classList.remove('hidden');
+                    summaryShippingCost.textContent = `$${shippingCost.toFixed(2)}`;
+                    total += shippingCost;
+                } else {
+                    summaryShippingRow.classList.add('hidden');
+                }
+
+                summaryTotal.textContent = `$${total.toFixed(2)}`;
+            }
+
+            function validateStep(stepIndex) {
+                const step = steps[stepIndex];
+                const inputs = step.querySelectorAll('input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled)');
+                let isValid = true;
+                
+                for (const input of inputs) {
+                    const isVisible = input.offsetParent !== null;
+                    if (input.required && isVisible) {
+                        if (!input.value.trim()) {
+                            isValid = false;
+                            input.classList.add('border-red-500');
+                        } else {
+                            input.classList.remove('border-red-500');
+                            if (input.type === 'email' && !/^\S+@\S+\.\S+$/.test(input.value)) {
+                                isValid = false;
+                                input.classList.add('border-red-500');
+                            }
+                        }
+                    }
+                }
+
+                if (!isValid) {
+                    alert('Please fill out all required fields correctly.');
+                }
+                return isValid;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (validateStep(currentStep) && currentStep < totalSteps - 1) {
+                    currentStep++;
+                    if (currentStep === totalSteps - 1) {
+                        updateOrderSummary();
+                    }
+                    showStep(currentStep);
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    showStep(currentStep);
+                }
+            });
+
+            form.addEventListener('submit', (event) => {
+                if (card) {
+                    handlePaymentSubmission(event, card);
+                } else {
+                    event.preventDefault();
+                    alert('Payment form is not yet initialized.');
+                }
+            });
+
+            // --- Form Element Logic ---
+            const amountOptions = document.getElementById('amount-options');
+            const selectedAmountInput = document.getElementById('selected-amount');
+            amountOptions.addEventListener('click', (e) => {
+                if (e.target.classList.contains('amount-btn')) {
+                    amountOptions.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected-amount'));
+                    e.target.classList.add('selected-amount');
+                    selectedAmountInput.value = e.target.getAttribute('data-amount');
+                }
+            });
+
+            const deliveryRadios = document.querySelectorAll('input[name="delivery_method"]');
+            const deliveryOptionContainers = document.querySelectorAll('.delivery-option');
+            const emailOptions = document.getElementById('email-options');
+            const pickupSection = document.getElementById('pickup-details-section');
+            const shippingSection = document.getElementById('shipping-address-section');
+            
+            const recipientEmailInput = document.getElementById('recipient-email');
+            const pickupDateInput = document.getElementById('pickup-date');
+            const shippingInputs = shippingSection.querySelectorAll('input, select');
+            const sendTimeRadios = document.querySelectorAll('input[name="send_time"]');
+            const sendDateContainer = document.getElementById('send-date-container');
+            const sendDateInput = document.getElementById('send-date');
+
+            function handleDeliveryChange() {
+                const method = document.querySelector('input[name="delivery_method"]:checked').value;
+
+                deliveryOptionContainers.forEach(container => {
+                    const radio = container.querySelector('input[name="delivery_method"]');
+                    container.classList.toggle('selected-delivery', radio.checked);
+                });
+                
+                emailOptions.classList.toggle('hidden', method !== 'email');
+                pickupSection.classList.toggle('hidden', method !== 'pickup');
+                shippingSection.classList.toggle('hidden', method !== 'shipping');
+
+                recipientEmailInput.required = (method === 'email');
+                pickupDateInput.required = (method === 'pickup');
+
+                shippingInputs.forEach(input => {
+                    if (input.id !== 'shipping-apt') {
+                        input.required = (method === 'shipping');
+                    }
+                });
+
+                const isFutureSend = document.querySelector('input[name="send_time"]:checked').value === 'future';
+                sendDateInput.required = (method === 'email' && isFutureSend);
+            }
+
+            deliveryRadios.forEach(radio => radio.addEventListener('change', handleDeliveryChange));
+
+            sendTimeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isFutureSend = this.value === 'future';
+                    sendDateContainer.classList.toggle('hidden', !isFutureSend);
+                    sendDateInput.required = isFutureSend;
+                });
+            });
+
+            function initializeForm() {
+                const states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"];
+                const stateSelect = document.getElementById('shipping-state');
+                stateSelect.innerHTML = '<option value="">State</option>';
+                states.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    stateSelect.appendChild(option);
+                });
+
+                const today = new Date();
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowString = tomorrow.toISOString().split('T')[0];
+
+                pickupDateInput.setAttribute('min', tomorrowString);
+                pickupDateInput.value = tomorrowString;
+                
+                sendDateInput.setAttribute('min', tomorrowString);
+
+                const defaultAmountButton = amountOptions.querySelector('button[data-amount="150"]');
+                if (defaultAmountButton) {
+                    defaultAmountButton.classList.add('selected-amount');
+                    selectedAmountInput.value = defaultAmountButton.getAttribute('data-amount');
+                }
+                
+                handleDeliveryChange();
+                showStep(currentStep);
+            }
+
+            initializeForm();
+        });
+    </script>
+</body>
+</html>
