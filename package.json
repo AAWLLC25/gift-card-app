@@ -1,10 +1,21 @@
 {
+  "name": "gift-card-app",
+  "version": "1.0.0",
+  "description": "Gift card purchasing application",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "18"
+  },
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.0.1",
-    "express": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "node-fetch": "^3.3.2",
-    "square": "^43.0.0",
-    "uuid": "^11.1.0"
+    "square": "^35.0.0",
+    "uuid": "^9.0.1"
   }
 }
